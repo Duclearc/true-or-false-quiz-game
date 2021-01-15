@@ -46,28 +46,42 @@ class QuizUI:
         self.window.mainloop()
 
     def play_game(self):
+        """initiates gameplay. Sets background to white.
+        If there's unanswered questions left and the user gave a correct answer, loads the next question.
+        Else triggers end_of_game."""
         self.question_board.config(bg='white')
         if self.game.remain_questions():
             q_text = self.game.next_question()
-            print(self.game.current_question.answer)
+            print(self.game.current_question.answer)  # cheat-sheet
             self.question_board.itemconfig(self.question_text, text=q_text)
         else:
-            if self.game.game_on:
-                screen_text = 'CONGRATULATIONS!!! YOU WIN THE GAME!'
-            else:
-                screen_text = 'Ops. You Lost!'
-            self.game.game_on = False
-            self.question_board.itemconfig(self.question_text, text=f'{screen_text}\n\nReplay questions?')
-            self.set_buttons()
+            self.end_of_game()
+
+    def end_of_game(self):
+        """evaluates if user won or lost and changes screen_text accordingly.
+        Sets game_on to False and triggers set_buttons()."""
+        if self.game.game_on:
+            screen_text = 'CONGRATULATIONS!!! YOU WIN THE GAME!'
+        else:
+            screen_text = 'Ops. You Lost!'
+        self.game.game_on = False
+        self.set_buttons()
+        self.question_board.itemconfig(self.question_text, text=f'{screen_text}\n\nReplay questions?')
 
     def answer_true(self):
+        """passes 'true' to give_feedback."""
         self.give_feedback('true')
 
     def answer_false(self):
+        """passes 'false' to give_feedback."""
         self.give_feedback('false')
 
-    def give_feedback(self, answer):
-        if self.game.check_answer(answer):
+    def give_feedback(self, given_answer):
+        """takes the given_answer and checks against the game's current_question.answer.
+        If True, changes screen to green and updates the score.
+        If False, changes screen to red and sets game_on to False.
+        Calls play_game after 1s."""
+        if self.game.check_answer(given_answer):
             self.question_board.config(bg='green')
             self.update_score()
         else:
@@ -76,23 +90,28 @@ class QuizUI:
         self.window.after(1000, self.play_game)
 
     def update_score(self):
+        """updates the scoreboard Label text attribute to reflect the current game.question_number."""
         self.scoreboard.config(text=f'Score: {self.game.question_number}')
 
     def continue_true(self):
+        """user wishes to replay.
+        Resets game, updates_score, resets the button's commands and calls play_game to restart."""
         self.game.reset_game()
         self.update_score()
         self.set_buttons()
         self.play_game()
 
     def continue_false(self):
-        self.question_board.itemconfig(
-            self.question_text,
-            text='Goodbye'
-        )
+        """user wishes to end game.
+        Changes screen text accordingly and disables the buttons."""
+        self.question_board.itemconfig(self.question_text, text='Goodbye')
         self.true_button.config(state="disabled")
         self.false_button.config(state="disabled")
 
     def set_buttons(self):
+        """checks value of game_on.
+        If True, sets button commands to answer questions.
+        Else, sets button commands to continue or end gameplay."""
         if self.game.game_on:
             self.true_button.config(command=self.answer_true)
             self.false_button.config(command=self.answer_false)
