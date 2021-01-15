@@ -10,6 +10,4 @@ for question in question_data:
     question_bank.append(Question(unescape(question['question']), question['correct_answer']))
 
 game = QuizBrain(question_bank)
-# quiz_ui = QuizUI(game)
-
-game.play_game()
+quiz_ui = QuizUI(game)

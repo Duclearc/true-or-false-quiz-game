@@ -1,7 +1,7 @@
 from requests import *
 
 # CONSTANTS
-TOTAL_QUESTIONS = 10
+TOTAL_QUESTIONS = 20
 API_ENDPOINT = 'https://opentdb.com/api.php'
 PARAMS = {
     "amount": TOTAL_QUESTIONS,
